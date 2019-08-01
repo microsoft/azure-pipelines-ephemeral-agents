@@ -1,0 +1,70 @@
+trigger: none
+
+variables:
+  ResourceGroup: ephemeral-agents-sample
+  vNetResourceGroup: ephemeral-agents-sample-vnet
+  vnetName: sampleprivatenetwork
+  location: eastus
+  acrName: ephemeralsampleregistry
+  imageName: $(acrName).azurecr.io/azurepipelinesbasicdeployagent/linux:ubuntu-16.04
+  containerName: 'test'
+  accountName: 'ephemeralsamplestorage'
+  agentPoolName: sample-ephemeralpool
+  azureSubscription: 'sample-azure-subscription'
+  containerRegistryConnection: 'ephemeral-sample-registry'
+
+stages:
+- stage: Deploy
+  jobs:
+  - job: PrepareAgent
+    displayName: Prepare Agent
+    pool: Hosted Ubuntu 1604
+    steps:
+    - task: AzureContainerAgentCreate@0
+      displayName: 'Azure Container Create for pool sample-ephemeralpool'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        resourceGroupName: $(ResourceGroup)
+        location: eastus
+        azureDevOpsToken: $(System.AccessToken)
+        containerRegistry: $(containerRegistryConnection)
+        imageName: $(imageName)
+        agentPool: $(agentPoolName)
+        agentPrefix: 'sample-'
+        vnetResourceGroupName: $(vNetResourceGroup)v
+        vnetName: $(vnetName)
+        subnetName: 'azure-devops-agents'
+
+  - deployment: Deploy
+    environment: 'Production'
+    dependsOn: PrepareAgent
+    displayName: Deploy Files
+    pool: ${{ variables.agentPoolName }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: date > $(Pipeline.Workspace)/data.txt
+            displayName: 'create dummy file to upload'
+          - task: AzureCLI@1
+            displayName: 'copy files to container'
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptLocation: inlineScript
+              inlineScript: |          
+                connectionString=$(az storage account show-connection-string --name $(accountName) --query connectionString --output tsv)
+                
+                echo listing
+                az storage blob list --container-name $(containerName) \
+                --auth-mode key \
+                --connection-string "$connectionString"
+                
+                echo "uploading"
+                
+                az storage blob upload-batch --auth-mode key\
+                  --account-name $(accountName) \
+                  --destination $(containerName) \
+                  --source $(Pipeline.Workspace) \
+                  --pattern '*.*' \
+                  --connection-string "$connectionString"
+                

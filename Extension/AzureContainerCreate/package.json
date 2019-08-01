@@ -1,0 +1,23 @@
+{
+  "name": "azurecontainer-create",
+  "version": "1.0.0",
+  "description": "Azure Pipelines Azure Container Image Create",
+  "main": "AzureContainerCreateTask.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/microsoft/azure-pipelines-ephemeral-agents.git"
+  },
+  "author": "Microsoft",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/microsoft/azure-pipelines-ephemeral-agents/issues"
+  },
+  "homepage": "https://github.com/microsoft/azure-pipelines-ephemeral-agents.git",
+  "dependencies": {
+    "azure-pipelines-task-lib": "^2.8.0",
+    "azure-devops-node-api": "^9.0.1"
+  }
+}

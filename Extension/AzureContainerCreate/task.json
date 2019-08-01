@@ -1,0 +1,292 @@
+{
+  "id": "8a6f782c-186d-4076-8b0b-65e9561537e7",
+  "name": "AzureContainerAgentCreate",
+  "friendlyName": "Azure Container Agent Create",
+  "description": "Provisons an Azure DevOps Agent in an Azure Container Instance.",
+  "author": "",
+  "helpUrl": "",
+  "helpMarkDown": "[Learn more about this task](https://marketplace.visualstudio.com/items?itemName=tiago-pascoal.EphemeralPipelinesAgents)",
+  "releaseNotes": "",
+  "category": "Azure Pipelines",
+  "visibility": ["Build", "Release"],
+  "runsOn": ["Agent", "DeploymentGroup"],
+  "demands": [],
+  "version": {
+    "Major": 0,
+    "Minor": 9,
+    "Patch": 0
+  },
+  "preview": "true",
+  "minimumAgentVersion": "2.0.0",
+  "instanceNameFormat": "Azure Container Create for pool $(agentPool)",
+  "showEnvironmentVariables": false,
+  "groups": [
+    {
+      "name": "azureDetails",
+      "displayName": "Azure",
+      "isExpanded": true
+    },
+    {
+      "name": "containerRepository",
+      "displayName": "Container Repository",
+      "isExpanded": true
+    },
+    {
+      "name": "agent",
+      "displayName": "Agent",
+      "isExpanded": true
+    },
+    {
+      "name": "VirtualNetwork",
+      "displayName": "Virtual Network",
+      "isExpanded": true
+    },
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": true
+    }
+  ],
+  "inputs": [
+    {
+      "name": "connectedServiceNameARM",
+      "aliases": ["azureSubscription"],
+      "type": "connectedService:AzureRM",
+      "label": "Azure subscription",
+      "groupName": "azureDetails",
+      "required": true,
+      "helpMarkDown": "Select an Azure resource manager subscription to provision the container",
+      "properties": {
+        "EndpointFilterRule": "ScopeLevel != ManagementGroup"
+      }
+    },
+    {
+      "name": "resourceGroupName",
+      "type": "pickList",
+      "label": "Resource group",
+      "groupName": "azureDetails",
+      "required": true,
+      "helpMarkDown": "Provide the name of the container resource group.",
+      "properties": {
+        "EditableOptions": "True"
+      }
+    },
+    {
+      "name": "location",
+      "type": "pickList",
+      "label": "Location",
+      "groupName": "azureDetails",
+      "required": true,
+      "helpMarkDown": "Location for deploying the container.",
+      "properties": {
+        "EditableOptions": "True"
+      }
+    },
+    {
+      "name": "azureDevOpsToken",
+      "type": "string",
+      "label": "Azure DevOps Token",
+      "groupName": "azureDetails",
+      "required": true,
+      "helpMarkDown": "Token to register the agent (can be $(System.AccessToken) as long as it has permissions administrative privileges on the pool you intend to register the agent."
+    },
+    {
+      "name": "containerRegistry",
+      "type": "connectedService:dockerregistry",
+      "label": "Container registry",
+      "groupName": "containerRepository",
+      "helpMarkDown": "Select a Docker registry service connection. Required for commands that need to authenticate with a registry."
+    },
+    {
+      "name": "imageName",
+      "type": "string",
+      "label": "Image",
+      "defaultValue": "",
+      "groupName": "agent",
+      "required": true,
+      "helpMarkDown": "A globally unique top-level domain name for your specific registry or namespace.<br/> Note: Fully qualified image name will be of the format: '<b>`<registry or namespace`></b>/`<repository`>:`<tag`>'. For example, '<b>myregistry.azurecr.io</b>/nginx:latest'."
+    },
+    {
+      "name": "addSPNToContainer",
+      "type": "boolean",
+      "defaultValue": "true",
+      "groupName": "agent",
+      "label": "Send SPN details to image",
+      "helpMarkDown": "Send service principal details to image, for example allows container deletion scenarios after it has finished the image script is responsible for these, this means the following environment variables will be passed (certificate based authentication not supported) <br> AZ_MANAGED_IDENTITY (true or false) <br> AZ_SERVICE_PRINCIPAL <br>  AZ_SERVICE_PRINCIPAL_KEY <br> AZ_CLOUD <br> AZ_ACI_NAME <br> AZ_ACI_RG <br> AZ_TENANT_ID <br> AZ_SUBSCRIPTION_ID."
+    },
+    {
+      "name": "agentPool",
+      "type": "string",
+      "label": "Agent Pool",
+      "defaultValue": "",
+      "groupName": "agent",
+      "required": true,
+      "helpMarkDown": "Arguments passed to the script"
+    },
+    {
+      "name": "agentPrefix",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*$",
+      "label": "Agent Prefix",
+      "groupName": "agent",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Agent prefix. The agent name will always be unique but you can opt in to preppend a prefix"
+    },
+    {
+      "name": "vnetResourceGroupName",
+      "type": "pickList",
+      "label": "Virtual Network Resource group",
+      "required": false,
+      "groupName": "VirtualNetwork",
+      "helpMarkDown": "Provide the name of the virtual network resource group. If not specified will use the container resource group",
+      "properties": {
+        "EditableOptions": "True"
+      }
+    },
+    {
+      "name": "vnetName",
+      "type": "string",
+      "label": "Virtual Network Name",
+      "required": false,
+      "groupName": "VirtualNetwork",
+      "helpMarkDown": "Provide the name of the virtual network."
+    },
+    {
+      "name": "subnetName",
+      "type": "string",
+      "label": "Subnet name",
+      "required": false,
+      "groupName": "VirtualNetwork",
+      "helpMarkDown": "Subnet name where for the container.",
+      "properties": {
+        "EditableOptions": "True"
+      }
+    },
+    {
+      "name": "timeoutAgentOnline",
+      "type": "string",
+      "label": "Max time to wait for agent to become online (sec).",
+      "defaultValue": "240",
+      "required": false,
+      "helpMarkDown": " The maximum amount of time we will wait for the agent to become online after the container has been provisioned (excludes provision time). Zero means we will not check if agent is online before proceeding. <br> If agent doesn't become online before the alloted time the container will be deleted and the task will fail.",
+      "groupName": "advanced"
+    },
+    {
+      "name": "osType",
+      "type": "pickList",
+      "label": "Image OS",
+      "defaultValue": "Linux",
+      "required": true,
+      "options": {
+        "Linux": "Linux",
+        "Windows": "Windows"
+      },
+      "helpMarkDown": "Container image operating system",
+      "groupName": "advanced",
+      "properties": {
+        "EditableOptions": "False"
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "string",
+      "label": "Container CPU cores",
+      "defaultValue": "1",
+      "pattern": "^[0-9]*$",
+      "required": false,
+      "helpMarkDown": "The required number of CPU cores of the containers",
+      "groupName": "advanced",
+      "validation": {
+        "expression": "isMatch(value, '^[0-9]*','IgnoreCase')",
+        "message": "Enter a valid number."
+      }
+    },
+    {
+      "name": "memory",
+      "type": "integer",
+      "label": "Container Memory (GB)",
+      "defaultValue": "1.0",
+      "pattern": "^[0-9]([.][0-9]+)?$",
+      "required": false,
+      "helpMarkDown": "The required memory of the containers in GB, accurate to one decimal place",
+      "groupName": "advanced",
+      "validation": {
+        "expression": "isMatch(value, '^[0-9]([.][0-9]+)?$','IgnoreCase')",
+        "message": "Enter a valid number up to a decimal house."
+      }
+    },
+    {
+      "name": "skipContainerDeletionOnError",
+      "type": "bool",
+      "label": "Skip Container Deletion on error",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "(useful to debug failed containers)",
+      "groupName": "advanced"
+    },
+    {
+      "name": "useGlobalConfig",
+      "type": "boolean",
+      "label": "Use global Azure CLI configuration",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "If this is false, this task will use its own separate [Azure CLI configuration directory](https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest#cli-configuration-file). This can be used to run Azure CLI tasks in *parallel* releases",
+      "groupName": "advanced"
+    }
+  ],
+  "dataSourceBindings": [
+    {
+      "target": "ResourceGroupName",
+      "endpointId": "$(connectedServiceNameARM)",
+      "dataSourceName": "AzureResourceGroups"
+    },
+    {
+      "target": "vnetResourceGroupName",
+      "endpointId": "$(connectedServiceNameARM)",
+      "dataSourceName": "AzureResourceGroups"
+    },
+    {
+      "target": "location",
+      "endpointId": "$(connectedServiceNameARM)",
+      "dataSourceName": "AzureLocations2",
+      "resultTemplate": "{ \"Value\" : \"{{{name}}}\", \"DisplayValue\" : \"{{{displayName}}}\" }"
+    }
+  ],
+  "outputVariables": [
+    {
+      "name": "ImageIdOutput",
+      "description": "The identifier of the created image."
+    },
+    {
+      "name": "ImageNameOutput",
+      "description": "The name of the created image."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "AzureContainerAgentCreate.js",
+      "argumentFormat": ""
+    }
+  },
+  "messages": {
+    "ScriptReturnCode": "Script exited with return code: %d",
+    "ScriptFailed": "Script failed with error: %s",
+    "UnsupportedEndpointScheme": "Unsupported service connection authorization scheme: Service Principal for AzureRM",
+    "AzureSDKNotFound": "Azure CLI 2.x is not installed on this machine.",
+    "FailedToLogout": "The following error occurred while logging out: %s",
+    "LoginFailed": "Azure login failed",
+    "MSILoginFailed": "Azure login failed using Managed Service Identity",
+    "AuthSchemeNotSupported": "Auth Scheme %s is not supported",
+    "ErrorInSettingUpSubscription": "Error in setting up subscription",
+    "SettingAzureConfigDir": "Setting AZURE_CONFIG_DIR env variable to: %s",
+    "SettingAzureCloud": "Setting active cloud to: %s",
+    "GlobalCliConfigAgentVersionWarning": "For agent version < 2.115.0, only global Azure CLI configuration can be used",
+    "GetSubnetFailed" : "Failed to get subnet id for %s in virtual network %s (RG: %s)",
+    "InvalidAgentPool" : "Agent Pool %s doesn't exist or missing permissions",
+    "WaitForAgentOnlineTimeout" : "Agent %s didn't came online, giving up. Increase timeout if needed.",
+    "VnetMandatoryWithSubnet" : "VNetname needs to be specified when specifying a subnet",
+    "MissingRequiredInputs" : "The following required inputs are missing: ",
+    "FailedContainerCreation" : "Couldn't create Azure Container Instance"
+  }
+}

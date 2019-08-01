@@ -1,0 +1,71 @@
+{
+  "manifestVersion": 1,
+  "id": "EphemeralPipelinesAgents",
+  "version": "1.0.0",
+  "name": "Ephemeral Pipelines Agents",
+  "scopes": [],
+  "description": "Provisions an ephemeral Azure container with an agent for deployment purposes",
+  "publisher": "",
+  "public": false,
+  "icons": {
+    "default": "static/images/logo.png"
+  },
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "tags": ["Azure", "Azure Container"],
+  "categories": ["Azure Pipelines"],
+  "screenshots": [
+    {
+      "path": "static/images/basic-pipeline.png"
+    },
+    {
+      "path": "static/images/azure-container-create-task.png"
+    }
+  ],
+  "content": {
+    "license": {
+      "path": "license.md"
+    },
+    "details": {
+      "path": "overview.md"
+    }
+  },
+  "links": {
+    "repository": {
+      "uri": "https://github.com/microsoft/azure-pipelines-ephemeral-agents"
+    },
+    "issues": {
+      "uri": "https://github.com/microsoft/azure-pipelines-ephemeral-agents/issues"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/microsoft/azure-pipelines-ephemeral-agents"
+  },
+  "branding": {
+    "color": "rgb(220, 235, 252)",
+    "theme": "light"
+  },
+  "files": [
+    {
+      "path": "static",
+      "addressable": true
+    },
+    {
+      "path": "AzureContainerCreate"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "AzureContainerCreate",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "type": "ms.vss-distributed-task.task",
+      "properties": {
+        "name": "AzureContainerCreate"
+      }
+    }
+  ]
+}

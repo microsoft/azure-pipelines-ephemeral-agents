@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "package": "npm run clean  && npm run compile  && tfx extension create  --rev-version",
+    "gallery-publish": "tfx extension publish --rev-version",
+    "clean": "rimraf ./*.vsix",
+    "compile": "tsc -p .",
+    "install-task-lib": "cd AzureContainerCreate && npm install --save-dev"
+  },
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "tfx-cli": "^0.7.8",
+    "typescript": "2.3.4"
+  },
+  "name": "vstsexttask",
+  "private": true,
+  "version": "0.0.1"
+}

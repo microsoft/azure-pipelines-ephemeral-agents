@@ -1,0 +1,53 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+# This pipelines builds both Linux and Windows image (if variables are set to true)
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  buildLinuxImage: true
+  buildWindowsImage: false
+  dockerRegistryServiceConnection: 'PipelineAgentsImagesRegistry'
+  imageRepository: 'azurepipelinesbasicdeployagent'
+  linuxDockerfilePath: '$(Build.SourcesDirectory)/AgentImages/Basic/Ubuntu/Dockerfile'
+  winDockerfilePath: '$(Build.SourcesDirectory)/AgentImages/Basic/Windows/Dockerfile'
+  
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:  
+  - job: Build_Linux_Ubuntu
+    displayName: Build Linux Images(s)
+    condition: eq(variables['buildLinuxImage'],'true')
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)/linux
+        dockerfile: $(linuxDockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: ubuntu-16.04
+  - job: Build_Windows
+    displayName: Build Windows Image(s)
+    condition: eq(variables['buildWindowsImage'],'true')
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)/windows/servercore
+        dockerfile: $(winDockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: ltsc2019
+
