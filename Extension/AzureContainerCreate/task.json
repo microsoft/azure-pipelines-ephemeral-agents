@@ -207,12 +207,12 @@
       "type": "integer",
       "label": "Container Memory (GB)",
       "defaultValue": "1.0",
-      "pattern": "^[0-9]([.][0-9]+)?$",
+      "pattern": "^[0-9]+([.][0-9]+)?$",
       "required": false,
       "helpMarkDown": "The required memory of the containers in GB, accurate to one decimal place",
       "groupName": "advanced",
       "validation": {
-        "expression": "isMatch(value, '^[0-9]([.][0-9]+)?$','IgnoreCase')",
+        "expression": "isMatch(value, '^[0-9]+([.][0-9]+)?$','IgnoreCase')",
         "message": "Enter a valid number up to a decimal house."
       }
     },
