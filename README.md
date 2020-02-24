@@ -1,6 +1,6 @@
 # Ephemeral Pipelines Agents
 
-When you want to deploy to Azure Resources that are exposed on the internet, and only accessible via a [private network](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview) you are excluded from using [Microsoft-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops), and you need to maintain your pool of [self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops#install).
+When you want to deploy to Azure Resources that aren't exposed on the internet, and only accessible via a [private network](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview) you are excluded from using [Microsoft-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops), and you need to maintain your pool of [self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops#install).
 
 Ephemeral pipelines agent eliminates the need to maintain self-hosted agents (for **deployment** purposes) and still be capable of deploying to private azure resources. Ephemeral pipeline agents run in an Azure Container Instance (no public IP address and access to the private network) which are created on a needed basis to run a single a pipeline job.
 
