@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies and add tools to path
+      run: |
+        npm install
+        npm run install-task-lib
+        echo "::add-path::${{ github.workspace }}/Extension/node_modules/.bin"
+      working-directory: ${{ github.workspace }}/Extension
+
+    - name: Compile extension
+      run: npm run compile
+      working-directory: ${{ github.workspace }}/Extension
+
+    - name: Package extension
+      run: |
+        tfx extension create --publisher dummy --extension-id dummy
+      working-directory: ${{ github.workspace }}/Extension
+

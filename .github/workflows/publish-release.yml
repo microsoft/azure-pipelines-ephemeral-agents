@@ -1,0 +1,29 @@
+on:
+    release:
+      types: [created]
+      
+  name: Publish Release to Marketplace
+  
+  jobs:
+    build-and-deploy:
+      name: Build and Publish
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2     
+  
+      - name: Install dependencies and add tools to path
+        run: |
+          pwd
+          npm install
+          npm run install-task-lib
+          echo "::add-path::${{ github.workspace }}/Extension/node_modules/.bin"
+        working-directory: ${{ github.workspace }}/Extension
+  
+      - name: Compile extension
+        run: npm run compile
+        working-directory: ${{ github.workspace }}/Extension
+  
+      - name: Package and publish ${{ github.event.release.tag_name }} to marketplace
+        run: |
+          tfx extension publish --publisher ${{ secrets.Publisher }} --override "{\"public\": true}" --token ${{ secrets.MarketplacePAT }}
+        working-directory: ${{ github.workspace }}/Extension
