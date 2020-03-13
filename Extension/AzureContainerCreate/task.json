@@ -2,7 +2,7 @@
   "id": "8a6f782c-186d-4076-8b0b-65e9561537e7",
   "name": "AzureContainerAgentCreate",
   "friendlyName": "Azure Container Agent Create",
-  "description": "Provisons an Azure DevOps Agent in an Azure Container Instance.",
+  "description": "Provisions an ephemeral Azure DevOps Agent in an Azure Container Instance.",
   "author": "",
   "helpUrl": "",
   "helpMarkDown": "[Learn more about this task](https://marketplace.visualstudio.com/items?itemName=tiago-pascoal.EphemeralPipelinesAgents)",
@@ -14,7 +14,7 @@
   "version": {
     "Major": 0,
     "Minor": 9,
-    "Patch": 0
+    "Patch": 1
   },
   "preview": "true",
   "minimumAgentVersion": "2.0.0",

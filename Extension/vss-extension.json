@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "EphemeralPipelinesAgents",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Ephemeral Pipelines Agents",
   "scopes": [],
   "description": "Provisions an ephemeral Azure container with an agent for deployment purposes",
